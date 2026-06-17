@@ -1,0 +1,39 @@
+# 流水线名称，GitHub页面展示
+name: Go CI 测试流水线
+
+# 触发规则：两种场景
+# 1. 任意分支Push
+# 2. 提交PR合并请求自动运行（代码合并前校验）
+on:
+  push:
+    branches: [ "*" ] # 任意分支Push触发
+  pull_request:
+    branches: [ main ] # 提交PR合并请求自动运行
+
+# 执行任务
+jobs:
+  go-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      # 步骤1：拉取当前仓库代码到虚拟机
+      - name: 拉取源码
+        uses: actions/checkout@v4
+
+      # 步骤2：安装Go语言环境
+      - name: 安装Go语言环境
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.26.x 
+
+      # 步骤3：代码格式化检查（规范校验）
+      - name: 代码格式化检查
+        run: go fmt ./...
+
+      # 步骤4：编译代码，检查是否存在编译错误
+      - name: 编译构建
+        run: go build -o app ./main.go
+      
+      # 步骤5：运行编译后的程序，验证输出
+      - name: 运行程序测试
+        run: ./app
+
